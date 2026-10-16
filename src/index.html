@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>俄罗斯方块 · Tetris</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>🧱</text></svg>">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="app">
+  <header class="topbar">
+    <h1><span class="logo"></span>俄罗斯方块</h1>
+    <div class="toolbar">
+      <button id="btnSound" class="ghost" type="button">🔊 音效</button>
+      <button id="btnPause" class="ghost" type="button">⏸ 暂停</button>
+      <button id="btnRestart" class="ghost" type="button">⟲ 重开</button>
+    </div>
+  </header>
+
+  <main class="stage">
+    <!-- 左侧：暂存 + 数据 -->
+    <aside class="side">
+      <section class="panel">
+        <h2>暂存</h2>
+        <canvas id="hold" aria-label="暂存方块"></canvas>
+      </section>
+      <section class="panel stats">
+        <div class="stat"><span>分数</span><b id="score">0</b></div>
+        <div class="stat"><span>最高</span><b id="best">0</b></div>
+        <div class="stat"><span>等级</span><b id="level">1</b></div>
+        <div class="stat"><span>消行</span><b id="lines">0</b></div>
+      </section>
+    </aside>
+
+    <!-- 中间：游戏区 -->
+    <div class="boardWrap">
+      <canvas id="board" aria-label="俄罗斯方块游戏区"></canvas>
+      <div id="toast" class="toast" aria-live="polite"></div>
+      <div id="overlay" class="overlay">
+        <div class="card">
+          <h3 id="ovTitle">俄罗斯方块</h3>
+          <p id="ovText">堆叠、消行，挑战你的极限</p>
+          <button id="ovBtn" class="primary" type="button">开始游戏</button>
+          <ul class="keys">
+            <li><kbd>←</kbd><kbd>→</kbd><i>左右移动</i></li>
+            <li><kbd>↓</kbd><i>软降</i></li>
+            <li><kbd>空格</kbd><i>硬降</i></li>
+            <li><kbd>↑</kbd><kbd>X</kbd><i>顺时针旋转</i></li>
+            <li><kbd>Z</kbd><kbd>A</kbd><i>逆时针旋转</i></li>
+            <li><kbd>C</kbd><i>暂存</i></li>
+            <li><kbd>P</kbd><i>暂停 / 继续</i></li>
+            <li><kbd>R</kbd><i>重新开始</i></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- 右侧：预览 -->
+    <aside class="side">
+      <section class="panel">
+        <h2>下一个</h2>
+        <canvas id="next" aria-label="后续方块"></canvas>
+      </section>
+    </aside>
+  </main>
+
+  <!-- 触屏操作区 -->
+  <div class="touch" id="touch">
+    <button type="button" data-act="ccw">↺</button>
+    <button type="button" data-act="cw">↻</button>
+    <button type="button" data-act="hold">暂存</button>
+    <button type="button" data-act="left">◀</button>
+    <button type="button" data-act="soft">▼</button>
+    <button type="button" data-act="right">▶</button>
+    <button type="button" class="wide" data-act="hard">硬降 ⤓</button>
+  </div>
+
+  <p class="hint" id="hint">方向键移动 · 空格硬降 · C 暂存 · P 暂停</p>
+</div>
+
+<script>
+/* 出错时直接在页面上提示，方便排查 */
+window.addEventListener('error', function (e) {
+  var d = document.createElement('div');
+  d.style.cssText = 'position:fixed;left:0;right:0;bottom:0;background:#7f1d1d;color:#fff;' +
+    'padding:10px 14px;font:12px/1.5 ui-monospace,Consolas,monospace;z-index:999;white-space:pre-wrap';
+  d.textContent = '脚本错误：' + (e.message || e.error) + '  @' + (e.filename || '') + ':' + (e.lineno || 0);
+  document.body.appendChild(d);
+}, true);
+</script>
+<script src="game.js"></script>
+</body>
+</html>
