@@ -1,0 +1,384 @@
+/* 俄罗斯方块 · 样式 */
+
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+:root {
+  --bg:        #06080f;
+  --panel:     rgba(18, 24, 42, .68);
+  --panelLine: rgba(120, 165, 255, .16);
+  --text:      #e9eeff;
+  --dim:       #8a96b8;
+  --accent:    #4ad1ff;
+  --accent2:   #b06bff;
+  --radius:    14px;
+}
+
+html, body { height: 100%; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: var(--text);
+  font-family: "Segoe UI", system-ui, -apple-system, "Microsoft YaHei", "PingFang SC", sans-serif;
+  background:
+    radial-gradient(900px 620px at 50% -12%, #17224a 0%, rgba(6, 8, 15, 0) 62%),
+    radial-gradient(700px 500px at 88% 110%, rgba(120, 60, 200, .22) 0%, rgba(6, 8, 15, 0) 60%),
+    var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(120, 165, 255, .05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(120, 165, 255, .05) 1px, transparent 1px);
+  background-size: 42px 42px;
+  mask-image: radial-gradient(720px 620px at 50% 40%, #000 0%, transparent 78%);
+  -webkit-mask-image: radial-gradient(720px 620px at 50% 40%, #000 0%, transparent 78%);
+  pointer-events: none;
+}
+
+.app {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+}
+
+/* 顶栏 */
+.topbar {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 0 2px;
+}
+
+.topbar h1 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: #dbe6ff;
+}
+
+.logo {
+  width: 15px;
+  height: 15px;
+  border-radius: 4px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  box-shadow: 0 0 14px rgba(74, 209, 255, .75);
+}
+
+.toolbar { display: flex; gap: 7px; }
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  color: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ghost {
+  padding: 7px 12px;
+  font-size: 12.5px;
+  color: #c3cfe8;
+  background: rgba(255, 255, 255, .05);
+  border: 1px solid var(--panelLine);
+  border-radius: 9px;
+  transition: .16s ease;
+}
+
+.ghost:hover {
+  background: rgba(90, 160, 255, .16);
+  border-color: rgba(120, 180, 255, .45);
+  color: #fff;
+}
+
+.ghost.off { opacity: .5; }
+
+/* 布局 */
+.stage {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.side {
+  width: 118px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--panelLine);
+  border-radius: var(--radius);
+  padding: 9px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06), 0 12px 30px rgba(0, 0, 0, .35);
+}
+
+.panel h2 {
+  margin: 0 0 7px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: .18em;
+  color: var(--dim);
+}
+
+#hold { width: 100%; aspect-ratio: 5 / 4; display: block; }
+#next { width: 100%; aspect-ratio: 1 / 3; display: block; }
+
+/* 数据面板 */
+.stats { display: flex; flex-direction: column; gap: 7px; }
+
+.stat {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.stat span {
+  font-size: 11px;
+  color: var(--dim);
+  letter-spacing: .08em;
+}
+
+.stat b {
+  font-size: 15px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: #fff;
+  text-shadow: 0 0 12px rgba(74, 209, 255, .45);
+}
+
+.stat.bump b { animation: bump .3s ease; }
+
+@keyframes bump {
+  0%   { transform: scale(1); }
+  45%  { transform: scale(1.22); color: var(--accent); }
+  100% { transform: scale(1); }
+}
+
+/* 棋盘 */
+.boardWrap {
+  position: relative;
+  border-radius: 16px;
+  box-shadow:
+    0 0 0 1px rgba(120, 170, 255, .22),
+    0 0 46px rgba(60, 130, 255, .28),
+    0 26px 60px rgba(0, 0, 0, .55);
+  line-height: 0;
+}
+
+#board {
+  display: block;
+  height: min(70vh, 600px);
+  aspect-ratio: 1 / 2;
+  max-width: 100%;
+  border-radius: 16px;
+  background: #070a15;
+}
+
+/* 浮动提示 */
+.toast {
+  position: absolute;
+  left: 50%;
+  top: 26%;
+  transform: translate(-50%, 0) scale(.8);
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: .1em;
+  line-height: 1.25;
+  text-align: center;
+  color: #fff;
+  text-shadow: 0 0 18px rgba(74, 209, 255, .95), 0 0 44px rgba(176, 107, 255, .7);
+  opacity: 0;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.toast.show { animation: toastPop .9s cubic-bezier(.2, .9, .25, 1) forwards; }
+
+.toast small {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .16em;
+  color: var(--accent);
+  margin-top: 4px;
+}
+
+@keyframes toastPop {
+  0%   { opacity: 0; transform: translate(-50%, 12px) scale(.7); }
+  22%  { opacity: 1; transform: translate(-50%, 0) scale(1.1); }
+  38%  { transform: translate(-50%, 0) scale(1); }
+  75%  { opacity: 1; transform: translate(-50%, -8px) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -26px) scale(.96); }
+}
+
+/* 遮罩层 */
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  border-radius: 16px;
+  background: rgba(6, 9, 18, .84);
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+  line-height: 1.5;
+  transition: opacity .2s ease, visibility .2s ease;
+}
+
+.overlay.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.card {
+  width: 100%;
+  max-width: 236px;
+  text-align: center;
+}
+
+.card h3 {
+  margin: 0 0 6px;
+  font-size: 21px;
+  letter-spacing: .04em;
+  background: linear-gradient(100deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.card p {
+  margin: 0 0 14px;
+  font-size: 12.5px;
+  color: var(--dim);
+  white-space: pre-line;
+}
+
+.primary {
+  width: 100%;
+  padding: 11px;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  color: #041018;
+  border-radius: 11px;
+  background: linear-gradient(100deg, var(--accent), #7cf0d2 60%, var(--accent2));
+  box-shadow: 0 10px 26px rgba(74, 209, 255, .35);
+  transition: transform .12s ease, box-shadow .16s ease;
+}
+
+.primary:hover { transform: translateY(-1px); box-shadow: 0 14px 32px rgba(74, 209, 255, .5); }
+.primary:active { transform: translateY(1px) scale(.99); }
+
+.keys {
+  list-style: none;
+  margin: 16px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 7px;
+  font-size: 11.5px;
+  color: var(--dim);
+}
+
+.keys li { display: flex; align-items: center; gap: 6px; }
+.keys i { font-style: normal; margin-left: auto; }
+
+kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 21px;
+  height: 21px;
+  padding: 0 5px;
+  font: 600 10.5px/1 ui-monospace, Consolas, monospace;
+  color: #cfe0ff;
+  background: rgba(255, 255, 255, .07);
+  border: 1px solid var(--panelLine);
+  border-bottom-width: 2px;
+  border-radius: 5px;
+}
+
+/* 触屏按键 */
+.touch {
+  display: none;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  width: 100%;
+  max-width: 340px;
+}
+
+.touch button {
+  padding: 14px 0;
+  font-size: 16px;
+  color: #d6e3ff;
+  background: rgba(255, 255, 255, .07);
+  border: 1px solid var(--panelLine);
+  border-radius: 12px;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+.touch button:active,
+.touch button.on {
+  background: rgba(74, 209, 255, .28);
+  border-color: rgba(74, 209, 255, .6);
+  color: #fff;
+}
+
+.touch .wide { grid-column: 1 / -1; }
+
+.hint {
+  margin: 0;
+  font-size: 11.5px;
+  letter-spacing: .05em;
+  color: rgba(138, 150, 184, .85);
+  text-align: center;
+}
+
+/* 触屏设备 / 窄屏适配 */
+.has-touch .touch { display: grid; }
+.has-touch .hint { display: none; }
+
+@media (max-width: 640px) {
+  body { padding: 10px; align-items: flex-start; }
+  .topbar h1 { font-size: 15px; }
+  .ghost { padding: 6px 9px; font-size: 11.5px; }
+  .side { width: 84px; }
+  .stat b { font-size: 13px; }
+  .stage { gap: 8px; }
+  #board { height: min(56vh, 520px); }
+  .touch { display: grid; }
+  .hint { display: none; }
+  .keys { font-size: 11px; }
+}
+
+@media (max-height: 620px) {
+  #board { height: min(74vh, 440px); }
+}
